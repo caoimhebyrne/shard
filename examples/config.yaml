@@ -1,0 +1,41 @@
+version: 1
+
+templates:
+  # here, we are defining a template named 'fabric'
+  fabric:
+    name: "{minecraft}-{my-env}"
+    # you can specify a loader and optionally a version
+    loader: fabric  # fabric@latest, forge@xxx
+    mods:
+      modrinth:
+        - sodium    # @latest by default
+        - lithium
+        - essential@1.4.1.1
+      files:
+        - ./some/path/to/file.jar
+    # you can specify JVM arguments too
+    jvm_args:
+      - "-Dtest=true"
+    # you can also override aspects of the template depending on an inp0ut
+    overrides:
+      minecraft:
+        # here, we specify an override on minecraft 26.1
+        "26.1":
+          mods:
+            # and we can remove a mod by adding a "-" in front of its mod ID
+            modrinth:
+              - "-sodium"
+
+# to create instances, you define the matrix
+matrix:
+  # a matrix uses a template
+  - uses: fabric
+    with:
+      # minecraft is the only "default"/required input, which indicates which versions to generate for
+      minecraft:
+        - 26.1
+        - 26.2
+      # "my-env" is a custom input, and is used in the instance name
+      my-env:
+        - abc
+        - def
