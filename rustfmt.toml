@@ -1,0 +1,40 @@
+style_edition = "2024"
+
+max_width = 120
+tab_spaces = 4
+hard_tabs = false
+newline_style = "Unix"
+
+use_small_heuristics = "Default"
+
+reorder_imports = true
+reorder_modules = true
+
+# `Foo { name }` instead of `Foo { name: name }`.
+use_field_init_shorthand = true
+
+# Collapse `#[derive(Debug)] #[derive(Clone)]` into one attribute.
+merge_derives = true
+
+# Strip redundant parens: `return (1);` -> `return 1;`
+remove_nested_parens = true
+
+# One `use` per crate root: `use std::{collections::HashMap, fmt};`
+imports_granularity = "Crate"
+
+# Three blank-line-separated blocks: std, external crates, then crate/self/super.
+group_imports = "StdExternalCrate"
+
+# Wrap over-long comments instead of letting them run past max_width.
+wrap_comments = true
+comment_width = 120
+
+# Format Rust code inside /// examples the same as real code.
+format_code_in_doc_comments = true
+
+# `use foo::bar::*;` instead of `use foo::bar::{*};`
+condense_wildcard_suffixes = true
+
+# Let a trailing array/struct/closure argument hug the closing paren rather
+# than forcing the whole call onto separate lines.
+overflow_delimited_expr = true
