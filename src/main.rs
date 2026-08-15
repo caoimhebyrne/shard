@@ -1,11 +1,18 @@
-use std::{fs, path::PathBuf};
+use std::{collections::BTreeMap, fs, path::PathBuf};
 
 use clap::Parser;
 use miette::{IntoDiagnostic, Result};
 
 use crate::{
-    config::v1::ShardConfig, instance::resolver::resolve_instances, manifest::ShardManifest,
-    prism::find_prism_data_directory,
+    config::v1::ShardConfig,
+    instance::resolver::resolve_instances,
+    manifest::ShardManifest,
+    prism::{
+        PrismLauncherInstance,
+        config::{GENERAL_SECTION, InstanceConfiguration},
+        find_prism_data_directory,
+        mmc_pack::{self, MultiMcPack, PackComponent},
+    },
 };
 
 mod config;
@@ -35,19 +42,69 @@ fn main() -> Result<()> {
 
     let contents = fs::read_to_string(args.configuration_file_path).into_diagnostic()?;
     let config = ShardConfig::from_str(&contents)?;
-    let instances = resolve_instances(&config)?;
 
     let manifest_file = prism_data_dir.join("shard-manifest.json");
-    let mut manifest = if manifest_file.exists() {
+    let manifest = if manifest_file.exists() {
         ShardManifest::from_path(&manifest_file).into_diagnostic()?
     } else {
         ShardManifest::default()
     };
 
-    // TODO: Assign IDs to instances from their inputs sorted alphabetically, e.g. `fabric-26.1`.
-    //       How will that work when we add a new layer of inputs? The old instances will kinda be detached then...
-    manifest.instance_ids = instances.iter().map(|it| it.id.clone()).collect();
     manifest.write_to_path(&manifest_file).into_diagnostic()?;
+
+    let instances = resolve_instances(&config)?;
+
+    for instance in instances {
+        let mut configuration = InstanceConfiguration::default();
+
+        configuration.set(GENERAL_SECTION, "ConfigVersion", "1.3");
+        configuration.set(GENERAL_SECTION, "iconKey", "default");
+        configuration.set(GENERAL_SECTION, "name", instance.name);
+
+        let pack = MultiMcPack {
+            format_version: mmc_pack::FORMAT_VERSION,
+            components: vec![
+                PackComponent {
+                    uid: "net.minecraft".into(),
+                    important: true,
+                    // TODO: A better way to get this?
+                    version: Some(instance.source.inputs["minecraft"].clone()),
+                    extra: BTreeMap::new(),
+                },
+                PackComponent {
+                    uid: "net.fabricmc.fabric-loader".into(),
+                    important: false,
+                    version: Some("0.19.3".into()),
+                    extra: BTreeMap::new(),
+                },
+            ],
+            extra: BTreeMap::new(),
+        };
+
+        let prism_instance = PrismLauncherInstance {
+            id: instance.id.clone(),
+            configuration,
+            pack,
+        };
+
+        let instance_directory = prism_data_dir.join("instances").join(&instance.id);
+        if instance_directory.exists() {
+            println!("instance '{}' already exists, skippping", instance.id);
+            continue;
+        }
+
+        std::fs::create_dir_all(&instance_directory).into_diagnostic()?;
+
+        let config_file = instance_directory.join("instance.cfg");
+        fs::write(config_file, prism_instance.configuration.to_string()).into_diagnostic()?;
+
+        let pack_file = instance_directory.join("mmc-pack.json");
+        fs::write(
+            pack_file,
+            serde_json::to_string(&prism_instance.pack).into_diagnostic()?,
+        )
+        .into_diagnostic()?;
+    }
 
     Ok(())
 }
