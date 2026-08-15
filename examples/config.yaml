@@ -5,10 +5,10 @@ templates:
   fabric:
     name: "{minecraft}-{my-env}"
     # you can specify a loader and optionally a version
-    loader: fabric  # fabric@latest, forge@xxx
+    loader: fabric # fabric@latest, forge@xxx
     mods:
       modrinth:
-        - sodium    # @latest by default
+        - sodium # @latest by default
         - lithium
         - essential@1.4.1.1
       files:
