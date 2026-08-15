@@ -1,9 +1,12 @@
 use std::{fs, path::PathBuf};
 
 use clap::Parser;
-use miette::{IntoDiagnostic, Result, miette};
+use miette::{IntoDiagnostic, Result};
 
-use crate::{config::v1::ShardConfig, instance::resolver::resolve_instances, manifest::ShardManifest};
+use crate::{
+    config::v1::ShardConfig, instance::resolver::resolve_instances, manifest::ShardManifest,
+    prism::find_prism_data_directory,
+};
 
 mod config;
 mod error;
@@ -21,25 +24,20 @@ struct Args {
     /// The path to the Prism Launcher data directory. If unset, a default directory depending on your platform will
     /// be used.
     #[arg(long)]
-    prism_data_dir: PathBuf, // TODO: optional
+    prism_data_dir: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
+    let prism_data_dir = find_prism_data_directory(args.prism_data_dir)?;
 
-    // TODO: validate that the instances directory exists, and probably some others?
-    if !args.prism_data_dir.is_dir() {
-        return Err(miette!(
-            "provided prism data path is either not a directory, or does not exist"
-        ));
-    }
+    println!("using prism data directory: '{}'", prism_data_dir.display());
 
     let contents = fs::read_to_string(args.configuration_file_path).into_diagnostic()?;
     let config = ShardConfig::from_str(&contents)?;
     let instances = resolve_instances(&config)?;
 
-    let manifest_file = args.prism_data_dir.join("shard-manifest.json");
-
+    let manifest_file = prism_data_dir.join("shard-manifest.json");
     let mut manifest = if manifest_file.exists() {
         ShardManifest::from_path(&manifest_file).into_diagnostic()?
     } else {
