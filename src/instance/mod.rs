@@ -7,6 +7,10 @@ pub mod resolver;
 /// A resolved instance built from a matrix within a [`ShardConfig`].
 #[derive(Debug)]
 pub struct ResolvedInstance {
+    /// A unique ID for this instance.
+    /// This is derived from the template, and then a sorted hyphenated list of input values.
+    pub id: String,
+
     /// The literal name of the instance (i.e. with all templates expanded).
     pub name: String,
 

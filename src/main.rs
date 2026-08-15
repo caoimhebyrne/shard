@@ -47,7 +47,7 @@ fn main() -> Result<()> {
 
     // TODO: Assign IDs to instances from their inputs sorted alphabetically, e.g. `fabric-26.1`.
     //       How will that work when we add a new layer of inputs? The old instances will kinda be detached then...
-    manifest.instance_ids = instances.iter().map(|it| it.name.clone()).collect();
+    manifest.instance_ids = instances.iter().map(|it| it.id.clone()).collect();
     manifest.write_to_path(&manifest_file).into_diagnostic()?;
 
     Ok(())

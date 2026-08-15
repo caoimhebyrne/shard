@@ -49,7 +49,17 @@ pub fn resolve_instances(config: &ShardConfig) -> Result<Vec<ResolvedInstance>> 
             .ok_or(InstanceResolverError::UndefinedTemplate(matrix.uses.clone()))?;
 
         for inputs in expand_inputs(&matrix.with) {
+            let hyphenated_values = inputs
+                .values()
+                .cloned()
+                .collect::<Vec<_>>()
+                .join("-")
+                .chars()
+                .map(|c| if c.is_alphanumeric() { c } else { '_' })
+                .collect::<String>();
+
             instances.push(ResolvedInstance {
+                id: format!("{}-{}", matrix.uses, hyphenated_values),
                 name: interpolate_string(&template.name, &inputs)?,
                 loader: template.loader.clone(),
                 mods: template.mods.clone(),
