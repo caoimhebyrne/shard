@@ -4,7 +4,7 @@ use clap::Parser;
 use miette::{IntoDiagnostic, Result};
 
 use crate::{
-    config::v1::ShardConfig,
+    config::{loader::LoaderVersion, v1::ShardConfig},
     instance::resolver::resolve_instances,
     manifest::ShardManifest,
     prism::{
@@ -61,23 +61,31 @@ fn main() -> Result<()> {
         configuration.set(GENERAL_SECTION, "iconKey", "default");
         configuration.set(GENERAL_SECTION, "name", instance.name);
 
+        let mut components = vec![PackComponent {
+            uid: "net.minecraft".into(),
+            important: true,
+            // TODO: A better way to get this?
+            version: Some(instance.source.inputs["minecraft"].clone()),
+            extra: BTreeMap::new(),
+        }];
+
+        if let Some(loader) = instance.loader {
+            let LoaderVersion::Explicit(version) = loader.version else {
+                todo!()
+            };
+
+            components.push(PackComponent {
+                // TODO
+                uid: "net.fabricmc.fabric-loader".into(),
+                important: false,
+                version: Some(version),
+                extra: BTreeMap::new(),
+            });
+        }
+
         let pack = MultiMcPack {
             format_version: mmc_pack::FORMAT_VERSION,
-            components: vec![
-                PackComponent {
-                    uid: "net.minecraft".into(),
-                    important: true,
-                    // TODO: A better way to get this?
-                    version: Some(instance.source.inputs["minecraft"].clone()),
-                    extra: BTreeMap::new(),
-                },
-                PackComponent {
-                    uid: "net.fabricmc.fabric-loader".into(),
-                    important: false,
-                    version: Some("0.19.3".into()),
-                    extra: BTreeMap::new(),
-                },
-            ],
+            components,
             extra: BTreeMap::new(),
         };
 

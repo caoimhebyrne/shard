@@ -1,5 +1,6 @@
 use serde::Deserialize;
 
+pub mod loader;
 pub mod v1;
 
 /// A basic "minimal" Shard config that can be used to load a specialised variant.

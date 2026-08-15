@@ -3,7 +3,7 @@ version: 1
 templates:
   fabric:
     name: "{minecraft}"
-    loader: fabric
+    loader: fabric@0.19.3
     mods:
       modrinth:
         - sodium

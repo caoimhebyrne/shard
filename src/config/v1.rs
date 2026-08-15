@@ -3,10 +3,13 @@ use std::collections::BTreeMap;
 use miette::{Result, miette};
 use serde::{Deserialize, Serialize};
 
-use crate::{config::BaseShardConfig, error::yaml_serde::YamlSerdeError};
+use crate::{
+    config::{BaseShardConfig, loader::Loader},
+    error::yaml_serde::YamlSerdeError,
+};
 
 /// A configuration for the shard system.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ShardConfig {
     /// The version that this [`ShardConfig`] was defined at.
@@ -22,14 +25,14 @@ pub struct ShardConfig {
 }
 
 /// A template to be used to generate instances within a matrix.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ShardTemplate {
     /// The name that should be applied to the instance once created.
     pub name: String,
 
     /// The string describing the loader.
-    pub loader: Option<String>,
+    pub loader: Option<Loader>,
 
     /// The mods that this template requires, a map from key to list of mod descriptors.
     #[serde(default)]

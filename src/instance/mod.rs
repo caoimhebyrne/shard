@@ -2,6 +2,8 @@
 
 use std::collections::BTreeMap;
 
+use crate::config::loader::Loader;
+
 pub mod resolver;
 
 /// A resolved instance built from a matrix within a [`ShardConfig`].
@@ -15,7 +17,7 @@ pub struct ResolvedInstance {
     pub name: String,
 
     /// The loader that the instance should use.
-    pub loader: Option<String>,
+    pub loader: Option<Loader>,
 
     /// A map of mod provider to mod descriptor.
     pub mods: BTreeMap<String, Vec<String>>,
