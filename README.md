@@ -31,8 +31,8 @@ templates:
             modrinth:
               - "-sodium"
 
-# to create instances, you define the matrix
-matrix:
+# to create instances, you define matrixes
+matrixes:
   # a matrix uses a template
   - uses: fabric
     with:

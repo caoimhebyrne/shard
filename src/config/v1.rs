@@ -12,10 +12,12 @@ pub struct ShardConfig {
     pub version: u8,
 
     /// The templates within this [`ShardConfig`].
+    #[serde(default)]
     pub templates: BTreeMap<String, ShardTemplate>,
 
-    /// The matrix defining the output instances.
-    pub matrix: Vec<ShardElement>,
+    /// The matrixes defining the output instances.
+    #[serde(default)]
+    pub matrixes: Vec<ShardMatrix>,
 }
 
 /// A template to be used to generate instances within a matrix.
@@ -25,14 +27,26 @@ pub struct ShardTemplate {
     pub name: String,
 
     /// The string describing the loader.
-    pub loader: String,
+    pub loader: Option<String>,
+
+    /// The mods that this template requires, a map from key to list of mod descriptors.
+    #[serde(default)]
+    pub mods: BTreeMap<String, Vec<String>>,
+
+    /// The JVM arguments that should be applied to generated instances.
+    #[serde(default)]
+    pub jvm_args: Vec<String>,
 }
 
 /// An element of the shard matrix, which defines the instances to generate.
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ShardElement {
+pub struct ShardMatrix {
     /// The name of the template that this element uses.
     pub uses: String,
+
+    /// The inputs passed to the template to be used as an expansion.
+    #[serde(default)]
+    pub with: BTreeMap<String, Vec<String>>,
 }
 
 impl ShardConfig {
