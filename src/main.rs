@@ -9,6 +9,7 @@ mod config;
 mod error;
 mod instance;
 mod manifest;
+mod prism;
 
 #[derive(Debug, clap::Parser)]
 #[command(version, about)]
