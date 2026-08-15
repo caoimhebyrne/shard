@@ -2,10 +2,11 @@ use std::{env, fs};
 
 use miette::{IntoDiagnostic, Result, miette};
 
-use crate::config::v1::ShardConfig;
+use crate::{config::v1::ShardConfig, instance::resolver::resolve_instances};
 
 mod config;
 mod error;
+mod instance;
 
 fn main() -> Result<()> {
     let file_path = env::args()
@@ -14,7 +15,9 @@ fn main() -> Result<()> {
 
     let contents = fs::read_to_string(file_path).into_diagnostic()?;
     let config = ShardConfig::from_str(&contents)?;
-    println!("Config: {config:#?}");
+    let instances = resolve_instances(&config)?;
+
+    println!("{instances:#?}");
 
     Ok(())
 }

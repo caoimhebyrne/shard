@@ -7,6 +7,7 @@ use crate::{config::BaseShardConfig, error::yaml_serde::YamlSerdeError};
 
 /// A configuration for the shard system.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShardConfig {
     /// The version that this [`ShardConfig`] was defined at.
     pub version: u8,
@@ -22,6 +23,7 @@ pub struct ShardConfig {
 
 /// A template to be used to generate instances within a matrix.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShardTemplate {
     /// The name that should be applied to the instance once created.
     pub name: String,
@@ -40,6 +42,7 @@ pub struct ShardTemplate {
 
 /// An element of the shard matrix, which defines the instances to generate.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ShardMatrix {
     /// The name of the template that this element uses.
     pub uses: String,
