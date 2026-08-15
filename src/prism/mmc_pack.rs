@@ -6,12 +6,13 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+
 /// The only `formatVersion` that Prism Launcher accepts.
 pub const FORMAT_VERSION: u8 = 1;
 
 /// The component list for a Prism Launcher instance, parsed from the `mmc-pack.json` file within the instance
 /// directory.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct MultiMcPack {
     /// The version of the file, which is always [`FORMAT_VERSION`].
@@ -26,7 +27,7 @@ pub struct MultiMcPack {
 }
 
 /// A single entry in the component list.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PackComponent {
     /// A unique identifier for the component, e.g. `net.minecraft`.
