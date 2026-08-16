@@ -19,6 +19,9 @@ pub struct ResolvedInstance {
     /// The loader that the instance should use.
     pub loader: Option<Loader>,
 
+    /// The version of Minecraft that this instance is for.
+    pub minecraft_version: String,
+
     /// A map of mod provider to mod descriptor.
     pub mods: BTreeMap<String, Vec<String>>,
 

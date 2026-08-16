@@ -64,8 +64,7 @@ fn main() -> Result<()> {
         let mut components = vec![PackComponent {
             uid: "net.minecraft".into(),
             important: true,
-            // TODO: A better way to get this?
-            version: Some(instance.source.inputs["minecraft"].clone()),
+            version: Some(instance.minecraft_version),
             extra: BTreeMap::new(),
         }];
 
@@ -95,23 +94,25 @@ fn main() -> Result<()> {
             pack,
         };
 
-        let instance_directory = prism_data_dir.join("instances").join(&instance.id);
-        if instance_directory.exists() {
-            println!("instance '{}' already exists, skippping", instance.id);
-            continue;
-        }
+        println!("{prism_instance:#?}");
 
-        std::fs::create_dir_all(&instance_directory).into_diagnostic()?;
+        // let instance_directory = prism_data_dir.join("instances").join(&instance.id);
+        // if instance_directory.exists() {
+        //     println!("instance '{}' already exists, skippping", instance.id);
+        //     continue;
+        // }
 
-        let config_file = instance_directory.join("instance.cfg");
-        fs::write(config_file, prism_instance.configuration.to_string()).into_diagnostic()?;
+        // std::fs::create_dir_all(&instance_directory).into_diagnostic()?;
 
-        let pack_file = instance_directory.join("mmc-pack.json");
-        fs::write(
-            pack_file,
-            serde_json::to_string(&prism_instance.pack).into_diagnostic()?,
-        )
-        .into_diagnostic()?;
+        // let config_file = instance_directory.join("instance.cfg");
+        // fs::write(config_file, prism_instance.configuration.to_string()).into_diagnostic()?;
+
+        // let pack_file = instance_directory.join("mmc-pack.json");
+        // fs::write(
+        //     pack_file,
+        //     serde_json::to_string(&prism_instance.pack).into_diagnostic()?,
+        // )
+        // .into_diagnostic()?;
     }
 
     Ok(())

@@ -13,6 +13,10 @@ pub enum InstanceResolverError {
     #[error("undefined template '{0}'")]
     UndefinedTemplate(String),
 
+    /// An matrix was defined, but no Minecraft version was available in its inputs.
+    #[error("matrix using template '{0}' does not define any minecraft versions")]
+    MissingMinecraftVersion(String),
+
     /// A placeholder was used in a string that does not correspond to an input.
     #[error("unknown placeholder found in template string")]
     #[diagnostic(help("available inputs: {available}"))]
@@ -49,6 +53,11 @@ pub fn resolve_instances(config: &ShardConfig) -> Result<Vec<ResolvedInstance>> 
             .ok_or(InstanceResolverError::UndefinedTemplate(matrix.uses.clone()))?;
 
         for inputs in expand_inputs(&matrix.with) {
+            // TODO: Maybe make `Inputs` a struct which has `minecraft`, and then a map of extra pairs?
+            let minecraft_version = inputs
+                .get("minecraft")
+                .ok_or_else(|| InstanceResolverError::MissingMinecraftVersion(matrix.uses.clone()))?;
+
             let hyphenated_values = inputs
                 .values()
                 .cloned()
@@ -62,6 +71,7 @@ pub fn resolve_instances(config: &ShardConfig) -> Result<Vec<ResolvedInstance>> 
                 id: format!("{}-{}", matrix.uses, hyphenated_values),
                 name: interpolate_string(&template.name, &inputs)?,
                 loader: template.loader.clone(),
+                minecraft_version: minecraft_version.clone(),
                 mods: template.mods.clone(),
                 source: InstanceSource {
                     inputs,
